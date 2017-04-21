@@ -15,13 +15,19 @@
   // Establish the root object, `window` in the browser, or `exports` on the server.
   var root = this;
 
-  // 保存全局对象上的
+  // 保存全局对象上的_属性
+  // 在后面的noConflict会有用
 
   // Save the previous value of the `_` variable.
   var previousUnderscore = root._;
 
+  // 保存Array、Object、Function的prototype引用
+  // 方便压缩而不是gzip
+
   // Save bytes in the minified (but not gzipped) version:
   var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
+
+  // 保存一些常见的数组或者对象方法引用
 
   // Create quick reference variables for speed access to core prototypes.
   var
@@ -29,6 +35,8 @@
     slice            = ArrayProto.slice,
     toString         = ObjProto.toString,
     hasOwnProperty   = ObjProto.hasOwnProperty;
+
+  // 保存es5中常见的部分方法
 
   // All **ECMAScript 5** native function implementations that we hope to use
   // are declared here.
@@ -41,11 +49,13 @@
   // Naked function reference for surrogate-prototype-swapping.
   var Ctor = function(){};
 
+  // _构造函数,实现了非new调用也可以返回实例对象，可以想想jQuery的使用方式
+
   // Create a safe reference to the Underscore object for use below.
   var _ = function(obj) {
-    if (obj instanceof _) return obj;
-    if (!(this instanceof _)) return new _(obj);
-    this._wrapped = obj;
+    if (obj instanceof _) return obj; // 如果obj已经是_的实例，则直接返回
+    if (!(this instanceof _)) return new _(obj); // 如果调用方式是_()的形式则手动new _()调用返回
+    this._wrapped = obj; // 将obj数据存放在_wrapped属性上方便后面使用
   };
 
   // Export the Underscore object for **Node.js**, with
