@@ -1213,10 +1213,14 @@
     return _.keys(obj).length === 0;
   };
 
+  // 判断obj是不是dom元素，主要通过nodeType来做检测
+
   // Is a given value a DOM element?
   _.isElement = function(obj) {
     return !!(obj && obj.nodeType === 1);
   };
+
+  // 判断obj是否是数组
 
   // Is a given value an array?
   // Delegates to ECMA5's native Array.isArray
@@ -1224,11 +1228,17 @@
     return toString.call(obj) === '[object Array]';
   };
 
+  // 判断obj是不是对象
+  // 注意不是判断Object类型，js中函数也是个对象
+  // 注意!!obj 这里是为了排除null (typeof null => object)
+
   // Is a given variable an object?
   _.isObject = function(obj) {
     var type = typeof obj;
     return type === 'function' || type === 'object' && !!obj;
   };
+
+  // 判断obj是否是'Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error'函数
 
   // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError.
   _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error'], function(name) {
@@ -1236,6 +1246,8 @@
       return toString.call(obj) === '[object ' + name + ']';
     };
   });
+
+  // 有些浏览器(例如<ie9)没有Arguments这种类型，通过检测是否有callee属性来判断是否是Arguments
 
   // Define a fallback version of the method in browsers (ahem, IE < 9), where
   // there isn't any inspectable "Arguments" type.
@@ -1253,30 +1265,49 @@
     };
   }
 
+  // 判断obj是否是无穷大，这里使用了原生的isFinite函数
+  // 后面还对NaN做了排除，作用何在？兼容？
+
   // Is a given object a finite number?
   _.isFinite = function(obj) {
     return isFinite(obj) && !isNaN(parseFloat(obj));
   };
 
+  // 判断obj是不是NaN(注意这里和原生的isNaN的作用和含义是不一样的)
+  // 符合NaN的条件是：为数字，并且不等于自身(那只有NaN了)
+
   // Is the given value `NaN`? (NaN is the only number which does not equal itself).
   _.isNaN = function(obj) {
-    return _.isNumber(obj) && obj !== +obj;
+    return _.isNumber(obj) && obj !== +obj; // +'1' => 1 将obj转化为数字的方法之一
   };
+
+  // 判断是否是布尔类型
+  // 布尔类型不是true or false嘛，为啥还要加最后的判断呢？亦或是只用最后的判断是不是也可以
 
   // Is a given value a boolean?
   _.isBoolean = function(obj) {
     return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
   };
 
+  // 判断obj是否是null
+  // 注意这里的三等号，意味着只判断null，不包括undefined
+
   // Is a given value equal to null?
   _.isNull = function(obj) {
     return obj === null;
   };
 
+  // 判断obj是否为undefined
+  // 注意这里的三等号，意味着只判断undefined，不包括null
+  // void 0  执行完之后返回undefined，正好用来做判断
+
   // Is a given variable undefined?
   _.isUndefined = function(obj) {
     return obj === void 0;
   };
+
+  // 判断obj是否拥有key属性
+  // 仅仅在对象自身查找，不涉及原型
 
   // Shortcut function for checking if an object has a given property directly
   // on itself (in other words, not on a prototype).
@@ -1287,12 +1318,16 @@
   // Utility Functions
   // -----------------
 
+  // 防止全局变量冲突的非常经典的解决方案
+
   // Run Underscore.js in *noConflict* mode, returning the `_` variable to its
   // previous owner. Returns a reference to the Underscore object.
   _.noConflict = function() {
-    root._ = previousUnderscore;
-    return this;
+    root._ = previousUnderscore; // 将previousUnderscore(_)重新赋值给全局对象
+    return this; // 并将_返回以供使用
   };
+
+  // 一个返回自身参数的函数，作为underscore.js默认的迭代器存在
 
   // Keep the identity function around for default iteratees.
   _.identity = function(value) {
@@ -1334,6 +1369,9 @@
     return accum;
   };
 
+  // random随机函数，返回[min, max)之间的一个整数
+  // 如果没有传max，则默认从0开始计算
+
   // Return a random integer between min and max (inclusive).
   _.random = function(min, max) {
     if (max == null) {
@@ -1342,6 +1380,9 @@
     }
     return min + Math.floor(Math.random() * (max - min + 1));
   };
+
+  // 得到系统时间戳
+  // 如果浏览器支持Date.now则用其，不支持就自己实现
 
   // A (possibly faster) way to get the current timestamp as an integer.
   _.now = Date.now || function() {
@@ -1385,6 +1426,8 @@
     }
     return _.isFunction(value) ? value.call(object) : value;
   };
+
+  // 生成唯一id
 
   // Generate a unique integer id (unique within the entire client session).
   // Useful for temporary DOM ids.
