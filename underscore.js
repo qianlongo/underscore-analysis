@@ -135,14 +135,16 @@
     };
   };
 
+  // 常见的实现继承的方式之一
+
   // An internal function for creating a new object that inherits from another.
   var baseCreate = function(prototype) {
-    if (!_.isObject(prototype)) return {};
-    if (nativeCreate) return nativeCreate(prototype);
-    Ctor.prototype = prototype;
-    var result = new Ctor;
-    Ctor.prototype = null;
-    return result;
+    if (!_.isObject(prototype)) return {}; // 如果prototype不是object类型直接返回空对象
+    if (nativeCreate) return nativeCreate(prototype); // 如果原生支持create则用原生的
+    Ctor.prototype = prototype; // 将prototype赋值为Ctor构造函数的原型
+    var result = new Ctor; // 创建一个Ctor实例对象
+    Ctor.prototype = null; // 为了下一次使用，将原型清空
+    return result; // 最后将实例返回
   };
 
   var property = function(key) {
@@ -1102,6 +1104,10 @@
 
   // Fill in a given object with default properties.
   _.defaults = createAssigner(_.allKeys, true);
+
+  // 模拟Object.create,第一个参数是要继承的原型，第二个参数是对象本身的属性
+  // 继承的原型的实现主要利用了baseCreate，下文会解析
+  // 然后将props合并到baseCreate返回的对象
 
   // Creates an object that inherits from the given prototype object.
   // If additional properties are provided then they will be added to the
