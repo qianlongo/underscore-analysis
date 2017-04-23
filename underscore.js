@@ -962,15 +962,21 @@
     return keys;
   };
 
+  // 获取对象obj的所有的键
+  // 与keys不同，这里包括继承来的key
+
   // Retrieve all the property names of an object.
   _.allKeys = function(obj) {
     if (!_.isObject(obj)) return [];
     var keys = [];
-    for (var key in obj) keys.push(key);
+    for (var key in obj) keys.push(key); // 直接读遍历取到的key，包括原型上的
     // Ahem, IE < 9.
-    if (hasEnumBug) collectNonEnumProps(obj, keys);
+    if (hasEnumBug) collectNonEnumProps(obj, keys); // 同样处理一下有枚举问题的浏览器
     return keys;
   };
+
+  // 获取对象obj所有值(上面是获取键)
+  // 注意这里不包括原型上的值，仅仅是obj自身的属性
 
   // Retrieve the values of an object's properties.
   _.values = function(obj) {
