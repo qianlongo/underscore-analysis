@@ -1118,6 +1118,10 @@
     return result;
   };
 
+  // 浅拷贝函数
+  // 实现的原理很简单，如果obj是个数组类型，就是直接复制一份
+  // 否则调动_.extend拷贝一份
+
   // Create a (shallow-cloned) duplicate of an object.
   _.clone = function(obj) {
     if (!_.isObject(obj)) return obj;
