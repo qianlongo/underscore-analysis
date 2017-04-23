@@ -150,6 +150,10 @@
   // Avoids a very nasty iOS 8 JIT bug on ARM-64. #2094
   var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
   var getLength = property('length');
+
+  // 判断对象是否为类数组
+  // 判断的依据是对象含有的length属性值是否是有意义的正数
+
   var isArrayLike = function(collection) {
     var length = getLength(collection);
     return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
@@ -276,12 +280,14 @@
     return false;
   };
 
+  // 判断obj中是否含有item这个值
+
   // Determine if the array or object contains a given item (using `===`).
   // Aliased as `includes` and `include`.
   _.contains = _.includes = _.include = function(obj, item, fromIndex, guard) {
-    if (!isArrayLike(obj)) obj = _.values(obj);
-    if (typeof fromIndex != 'number' || guard) fromIndex = 0;
-    return _.indexOf(obj, item, fromIndex) >= 0;
+    if (!isArrayLike(obj)) obj = _.values(obj); // 如果obj不是类数组，就取对象的值拼成数组
+    if (typeof fromIndex != 'number' || guard) fromIndex = 0; // 默认fromIndex传入的不是数字就从0的位置开始查找，(guard后续分析到再看)
+    return _.indexOf(obj, item, fromIndex) >= 0; // 判断调用indexOf方法返回查找后的索引值是否大于0(indexOf调用后不存在返回-1)
   };
 
   // Invoke a method (with arguments) on every item in a collection.
@@ -939,15 +945,18 @@
     }
   }
 
+  // 获取对象obj的所有键
+  // 这里的键不包括原型上的
+
   // Retrieve the names of an object's own properties.
   // Delegates to **ECMAScript 5**'s native `Object.keys`
   _.keys = function(obj) {
-    if (!_.isObject(obj)) return [];
-    if (nativeKeys) return nativeKeys(obj);
+    if (!_.isObject(obj)) return []; // 如果obj不是object类型直接返回空数组
+    if (nativeKeys) return nativeKeys(obj); // 如果浏览器支持原生的keys方法，则使用原生的keys
     var keys = [];
-    for (var key in obj) if (_.has(obj, key)) keys.push(key);
+    for (var key in obj) if (_.has(obj, key)) keys.push(key); // 注意这里1、for in会遍历原型上的键，所以用_.has来确保读取的只是对象本身的属性
     // Ahem, IE < 9.
-    if (hasEnumBug) collectNonEnumProps(obj, keys);
+    if (hasEnumBug) collectNonEnumProps(obj, keys); // 这里主要处理ie9以下的浏览器的bug，会将对象上一些本该枚举的属性认为不可枚举，详细可以看collectNonEnumProps分析
     return keys;
   };
 
