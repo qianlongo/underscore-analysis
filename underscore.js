@@ -114,6 +114,7 @@
   // extend 拷贝obj后的参数对象到obj上，并且相同的属性后者会覆盖前者(这里的拷贝包括原型上的)
   // extendOwn、assign拷贝obj后的参数对象到obj上，并且相同的属性后者会覆盖前者(这里的拷贝不包括原型上的)
   // defaults 拷贝obj后的参数对象到obj上，并且相同的属性只会进行一次覆盖即前者key对应的value为undefined的时候(这里的拷贝包括原型上的)
+  // 特别注意下划线中的extend、extendOwn、assign、defaults的拷贝不是深复制
 
   // An internal function for creating assigner functions.
   var createAssigner = function(keysFunc, undefinedOnly) {
