@@ -924,22 +924,24 @@
   // ----------------
 
   // Keys in IE < 9 that won't be iterated by `for key in ...` and thus missed.
-  var hasEnumBug = !{toString: null}.propertyIsEnumerable('toString');
+  var hasEnumBug = !{toString: null}.propertyIsEnumerable('toString'); // 判断浏览器是否存在枚举bug，如果有，在取反操作前会返回false
   var nonEnumerableProps = ['valueOf', 'isPrototypeOf', 'toString',
-                      'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString'];
+                      'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString']; // 所有需要处理的可能存在枚举问题的属性
+
+  // 处理ie9以下的一个枚举bug
 
   function collectNonEnumProps(obj, keys) {
     var nonEnumIdx = nonEnumerableProps.length;
     var constructor = obj.constructor;
-    var proto = (_.isFunction(constructor) && constructor.prototype) || ObjProto;
+    var proto = (_.isFunction(constructor) && constructor.prototype) || ObjProto;  // 读取obj的原型
 
     // Constructor is a special case.
-    var prop = 'constructor';
+    var prop = 'constructor'; // 这里我也有个疑问，对于constructor属性为什么要单独处理？
     if (_.has(obj, prop) && !_.contains(keys, prop)) keys.push(prop);
 
     while (nonEnumIdx--) {
       prop = nonEnumerableProps[nonEnumIdx];
-      if (prop in obj && obj[prop] !== proto[prop] && !_.contains(keys, prop)) {
+      if (prop in obj && obj[prop] !== proto[prop] && !_.contains(keys, prop)) { // nonEnumerableProps中的属性出现在obj中，并且不是原型中，再者keys中不存在，就添加进去
         keys.push(prop);
       }
     }
