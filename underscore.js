@@ -1004,6 +1004,9 @@
       return results;
   };
 
+  // 把一个对象转变为一个[key, value]形式的数组。
+  // 实现的思路很简单，获取obj的所有key，生成一个等长的数组，然后进行[key, value]循环操作
+
   // Convert an object into a list of `[key, value]` pairs.
   _.pairs = function(obj) {
     var keys = _.keys(obj);
@@ -1015,6 +1018,9 @@
     return pairs;
   };
 
+  // 返回一个object副本，使其键（keys）和值（values）对换
+  // 注意这里必须确保object里所有的值都是唯一的且可以序列号成字符串.
+
   // Invert the keys and values of an object. The values must be serializable.
   _.invert = function(obj) {
     var result = {};
@@ -1025,14 +1031,16 @@
     return result;
   };
 
+  // 返回对象obj中经过排序的函数集
+
   // Return a sorted list of the function names available on the object.
   // Aliased as `methods`
   _.functions = _.methods = function(obj) {
     var names = [];
     for (var key in obj) {
-      if (_.isFunction(obj[key])) names.push(key);
+      if (_.isFunction(obj[key])) names.push(key); // 是函数，就装载进去
     }
-    return names.sort();
+    return names.sort(); // 最后返回经过排序的数组
   };
 
   // Extend a given object with all the properties in passed-in object(s).
@@ -1103,6 +1111,9 @@
     return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
   };
 
+  // 用obj作为参数来调用函数interceptor，然后返回object
+  // 经常作为链式调用的一环，对obj进行了某些操作后，又返回obj，方便下一次操作
+
   // Invokes interceptor with the obj, and then returns obj.
   // The primary purpose of this method is to "tap into" a method chain, in
   // order to perform operations on intermediate results within the chain.
@@ -1111,14 +1122,17 @@
     return obj;
   };
 
+  // 判断attrs对象上的属性是不是全在object中
+  // 注意不仅仅是在object中查找，还包括其原型
+
   // Returns whether an object has a given set of `key:value` pairs.
   _.isMatch = function(object, attrs) {
     var keys = _.keys(attrs), length = keys.length;
     if (object == null) return !length;
-    var obj = Object(object);
+    var obj = Object(object); // 防止object不是对象
     for (var i = 0; i < length; i++) {
       var key = keys[i];
-      if (attrs[key] !== obj[key] || !(key in obj)) return false;
+      if (attrs[key] !== obj[key] || !(key in obj)) return false; // 如果key对应的值不相等 或者key不在object中就返回false（其实是不是先判断key是否在object中会更快?）
     }
     return true;
   };
@@ -1222,12 +1236,14 @@
     return eq(a, b);
   };
 
+  // 判断obj是否不包含可枚举的属性
+
   // Is a given array, string, or object empty?
   // An "empty" object has no enumerable own-properties.
   _.isEmpty = function(obj) {
     if (obj == null) return true;
-    if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0;
-    return _.keys(obj).length === 0;
+    if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0; // 如果是类数组直接判断length长度是否为0
+    return _.keys(obj).length === 0; // 如果是对象，则先获取自身的keys，在判断length长度是否为0来确定
   };
 
   // 判断obj是不是dom元素，主要通过nodeType来做检测
