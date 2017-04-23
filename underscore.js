@@ -110,17 +110,23 @@
     return cb(value, context, Infinity);
   };
 
+  // 这个函数非常重要，为下文中的extend、extendOwn、assign、defaults提供生成的来源
+  // extend 拷贝obj后的参数对象到obj上，并且相同的属性后者会覆盖前者(这里的拷贝包括原型上的)
+  // extendOwn、assign拷贝obj后的参数对象到obj上，并且相同的属性后者会覆盖前者(这里的拷贝不包括原型上的)
+  // defaults 拷贝obj后的参数对象到obj上，并且相同的属性只会进行一次覆盖即前者key对应的value为undefined的时候(这里的拷贝包括原型上的)
+
   // An internal function for creating assigner functions.
   var createAssigner = function(keysFunc, undefinedOnly) {
     return function(obj) {
       var length = arguments.length;
-      if (length < 2 || obj == null) return obj;
-      for (var index = 1; index < length; index++) {
-        var source = arguments[index],
-            keys = keysFunc(source),
+      if (length < 2 || obj == null) return obj; // 当参数只有obj一个或者obj为空时 直接返回obj
+      for (var index = 1; index < length; index++) { // 从第二个参数开始拷贝
+        var source = arguments[index], // 取出其中一个source
+            keys = keysFunc(source), // keysFunc对应的是_.keys || _.allKeys
             l = keys.length;
-        for (var i = 0; i < l; i++) {
+        for (var i = 0; i < l; i++) { // 循环往obj中拷贝
           var key = keys[i];
+          // 因为extend和extendOwn、assign传的undefinedOnly为undefined，而defaults传的是true，所以正好实现了几个函数对应的功能
           if (!undefinedOnly || obj[key] === void 0) obj[key] = source[key];
         }
       }
