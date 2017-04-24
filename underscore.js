@@ -653,15 +653,19 @@
     return result;
   };
 
+  // 将数组转化为对象
+  // 1. ([[], []])
+  // 2. ([], [])
+
   // Converts lists into objects. Pass either a single array of `[key, value]`
   // pairs, or two parallel arrays of the same length -- one of keys, and one of
   // the corresponding values.
   _.object = function(list, values) {
     var result = {};
     for (var i = 0, length = getLength(list); i < length; i++) {
-      if (values) {
+      if (values) { // 对应情况2的调用方式
         result[list[i]] = values[i];
-      } else {
+      } else { // 对应情况1的调用方式
         result[list[i][0]] = list[i][1];
       }
     }
@@ -730,6 +734,10 @@
   _.indexOf = createIndexFinder(1, _.findIndex, _.sortedIndex);
   _.lastIndexOf = createIndexFinder(-1, _.findLastIndex);
 
+  // 一个用来创建整数灵活编号的函数
+  // _.range(10) [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
+  // _.range(0, 10, 3) [ 0, 3, 6, 9 ]
+
   // Generate an integer Array containing an arithmetic progression. A port of
   // the native Python `range()` function. See
   // [the Python documentation](http://docs.python.org/library/functions.html#range).
@@ -738,9 +746,9 @@
       stop = start || 0;
       start = 0;
     }
-    step = step || 1;
+    step = step || 1; // 做一些参数的处理
 
-    var length = Math.max(Math.ceil((stop - start) / step), 0);
+    var length = Math.max(Math.ceil((stop - start) / step), 0); // Math.ceil处理针对(10/3)除不尽的情况，并且需要向上取整
     var range = Array(length);
 
     for (var idx = 0; idx < length; idx++, start += step) {
