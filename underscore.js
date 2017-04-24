@@ -498,14 +498,20 @@
   // Array Functions
   // ---------------
 
+  // 一个能够返回数组前n个元素的函数，默认是1
+
   // Get the first element of an array. Passing **n** will return the first N
   // values in the array. Aliased as `head` and `take`. The **guard** check
   // allows it to work with `_.map`.
   _.first = _.head = _.take = function(array, n, guard) {
-    if (array == null) return void 0;
-    if (n == null || guard) return array[0];
-    return _.initial(array, array.length - n);
+    if (array == null) return void 0; // 如果array为空直接返回undefined
+    if (n == null || guard) return array[0]; //如果没传n，直接返回数组第一个值
+    return _.initial(array, array.length - n); // 结合initial，相当于(slice(0, array.length - (array.length - n))) => slice(0, n)
   };
+
+  // 一个能够返回排除数组后面n个元素的数组的函数，默认是1
+  // (n == null || guard ? 1 : n) 的结果是1或者n，至于n有什么作用到后面我们会说！！！先埋一个坑
+  // Math.max其实是防止(array.length - x)减出来是个负数，如果是负数则取0
 
   // Returns everything but the last entry of the array. Especially useful on
   // the arguments object. Passing **n** will return all the values in
