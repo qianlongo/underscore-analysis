@@ -73,6 +73,11 @@
   // Current version.
   _.VERSION = '1.8.3';
 
+  // 一个经过了优化的回调函数返回函数
+  // 我觉得其实目的就是两个
+  // 1 绑定this作用域
+  // 2 尽量使用指定参数，而不是arguments
+
   // Internal function that returns an efficient (for current engines) version
   // of the passed-in callback, to be repeatedly applied in other Underscore
   // functions.
@@ -97,6 +102,12 @@
     };
   };
 
+  // 内部函数cb
+  // 如果value为空，就返回一个返回参数自身的回调函数
+  // 如果value为一个函数，就返回一个绑定了this作用域的回调函数
+  // 如果value为一个对象，就返回一个是否匹配属性的函数
+  // 否则返回一个读取对象value属性的回调函数
+
   // A mostly-internal function to generate callbacks that can be applied
   // to each element in a collection, returning the desired result — either
   // identity, an arbitrary callback, a property matcher, or a property accessor.
@@ -106,6 +117,10 @@
     if (_.isObject(value)) return _.matcher(value);
     return _.property(value);
   };
+
+  // 一个重要的内部函数用来生成可应用到集合中每个元素的回调
+  // 调用了内部函数cb，解析请看上个函数
+
   _.iteratee = function(value, context) {
     return cb(value, context, Infinity);
   };
@@ -147,9 +162,11 @@
     return result; // 最后将实例返回
   };
 
+  // 返回一个能够读取obj对象的key属性的函数
+
   var property = function(key) {
     return function(obj) {
-      return obj == null ? void 0 : obj[key];
+      return obj == null ? void 0 : obj[key]; // 如果传入的obj为null或者undefined就返回undefined,否则返回obj的key属性
     };
   };
 
@@ -1395,6 +1412,9 @@
 
   _.property = property;
 
+  // 与property函数相反
+  // 返回一个函数，专门用来读取obj对象的属性
+
   // Generates a function for a given object that returns a given property.
   _.propertyOf = function(obj) {
     return obj == null ? function(){} : function(key) {
@@ -1402,12 +1422,14 @@
     };
   };
 
+  // 返回一个断言函数(返回值是布尔类型的函数)
+
   // Returns a predicate for checking whether an object has a given set of
   // `key:value` pairs.
   _.matcher = _.matches = function(attrs) {
-    attrs = _.extendOwn({}, attrs);
+    attrs = _.extendOwn({}, attrs); // 本地先保存一份attrs的副本
     return function(obj) {
-      return _.isMatch(obj, attrs);
+      return _.isMatch(obj, attrs); // 判断attrs是否全在obj中
     };
   };
 
