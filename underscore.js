@@ -520,6 +520,8 @@
     return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
   };
 
+  // 一个获取数组最后n个元素构成的数组，默认是最后一位
+
   // Get the last element of an array. Passing **n** will return the last N
   // values in the array.
   _.last = function(array, n, guard) {
@@ -527,6 +529,8 @@
     if (n == null || guard) return array[array.length - 1];
     return _.rest(array, Math.max(0, array.length - n));
   };
+
+  // 一个能够返回数组第n个元素之后的元素构成的数组，注意不包含第n个元素
 
   // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
   // Especially useful on the arguments object. Passing an **n** will return
