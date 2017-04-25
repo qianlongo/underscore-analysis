@@ -8,26 +8,17 @@
   // Baseline setup
   // --------------
 
-  // 保存全局对象
-  // 在浏览器中是 window
-  // 在服务端是 exports
-
   // Establish the root object, `window` in the browser, or `exports` on the server.
+  // 保存顶层全局变量 浏览器中是window 服务器中是exports
   var root = this;
 
-  // 保存全局对象上的_属性
-  // 在后面的noConflict会有用
-
   // Save the previous value of the `_` variable.
+  // 缓存下划线 _
   var previousUnderscore = root._;
 
-  // 保存Array、Object、Function的prototype引用
-  // 方便压缩而不是gzip
-
   // Save bytes in the minified (but not gzipped) version:
+  // 缓存一些常见的构造函数的原型 => 可减少原型查找过程
   var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
-
-  // 保存一些常见的数组或者对象方法引用
 
   // Create quick reference variables for speed access to core prototypes.
   var
@@ -36,10 +27,9 @@
     toString         = ObjProto.toString,
     hasOwnProperty   = ObjProto.hasOwnProperty;
 
-  // 保存es5中常见的部分方法
-
   // All **ECMAScript 5** native function implementations that we hope to use
   // are declared here.
+  // 缓存一些es5中的函数
   var
     nativeIsArray      = Array.isArray,
     nativeKeys         = Object.keys,
@@ -47,20 +37,26 @@
     nativeCreate       = Object.create;
 
   // Naked function reference for surrogate-prototype-swapping.
+  // 一个空的构造函数
   var Ctor = function(){};
 
-  // _构造函数,实现了非new调用也可以返回实例对象，可以想想jQuery的使用方式
-
   // Create a safe reference to the Underscore object for use below.
+  /*
+   *下划线的构造函数
+   * 如果传进来的obj是_的实例就直接返回obj
+   * 如果调用方法不是 new _(obj) 形式就自己new 一次再返回
+   * 保证_(obj) || new (obj)两种形式都可以正常运行
+  */
   var _ = function(obj) {
-    if (obj instanceof _) return obj; // 如果obj已经是_的实例，则直接返回
-    if (!(this instanceof _)) return new _(obj); // 如果调用方式是_()的形式则手动new _()调用返回
-    this._wrapped = obj; // 将obj数据存放在_wrapped属性上方便后面使用
+    if (obj instanceof _) return obj;
+    if (!(this instanceof _)) return new _(obj);
+    this._wrapped = obj;
   };
 
   // Export the Underscore object for **Node.js**, with
   // backwards-compatibility for the old `require()` API. If we're in
   // the browser, add `_` as a global object.
+  // 对浏览器和服务端暴露_做一些处理
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
       exports = module.exports = _;
@@ -71,12 +67,8 @@
   }
 
   // Current version.
+  // _当前的版本
   _.VERSION = '1.8.3';
-
-  // 一个经过了优化的回调函数返回函数
-  // 我觉得其实目的就是两个
-  // 1 绑定this作用域
-  // 2 尽量使用指定参数，而不是arguments
 
   // Internal function that returns an efficient (for current engines) version
   // of the passed-in callback, to be repeatedly applied in other Underscore
@@ -102,12 +94,6 @@
     };
   };
 
-  // 内部函数cb
-  // 如果value为空，就返回一个返回参数自身的回调函数
-  // 如果value为一个函数，就返回一个绑定了this作用域的回调函数
-  // 如果value为一个对象，就返回一个是否匹配属性的函数
-  // 否则返回一个读取对象value属性的回调函数
-
   // A mostly-internal function to generate callbacks that can be applied
   // to each element in a collection, returning the desired result — either
   // identity, an arbitrary callback, a property matcher, or a property accessor.
@@ -117,32 +103,21 @@
     if (_.isObject(value)) return _.matcher(value);
     return _.property(value);
   };
-
-  // 一个重要的内部函数用来生成可应用到集合中每个元素的回调
-  // 调用了内部函数cb，解析请看上个函数
-
   _.iteratee = function(value, context) {
     return cb(value, context, Infinity);
   };
-
-  // 这个函数非常重要，为下文中的extend、extendOwn、assign、defaults提供生成的来源
-  // extend 拷贝obj后的参数对象到obj上，并且相同的属性后者会覆盖前者(这里的拷贝包括原型上的)
-  // extendOwn、assign拷贝obj后的参数对象到obj上，并且相同的属性后者会覆盖前者(这里的拷贝不包括原型上的)
-  // defaults 拷贝obj后的参数对象到obj上，并且相同的属性只会进行一次覆盖即前者key对应的value为undefined的时候(这里的拷贝包括原型上的)
-  // 特别注意下划线中的extend、extendOwn、assign、defaults的拷贝不是深复制
 
   // An internal function for creating assigner functions.
   var createAssigner = function(keysFunc, undefinedOnly) {
     return function(obj) {
       var length = arguments.length;
-      if (length < 2 || obj == null) return obj; // 当参数只有obj一个或者obj为空时 直接返回obj
-      for (var index = 1; index < length; index++) { // 从第二个参数开始拷贝
-        var source = arguments[index], // 取出其中一个source
-            keys = keysFunc(source), // keysFunc对应的是_.keys || _.allKeys
+      if (length < 2 || obj == null) return obj;
+      for (var index = 1; index < length; index++) {
+        var source = arguments[index],
+            keys = keysFunc(source),
             l = keys.length;
-        for (var i = 0; i < l; i++) { // 循环往obj中拷贝
+        for (var i = 0; i < l; i++) {
           var key = keys[i];
-          // 因为extend和extendOwn、assign传的undefinedOnly为undefined，而defaults传的是true，所以正好实现了几个函数对应的功能
           if (!undefinedOnly || obj[key] === void 0) obj[key] = source[key];
         }
       }
@@ -150,23 +125,19 @@
     };
   };
 
-  // 常见的实现继承的方式之一
-
   // An internal function for creating a new object that inherits from another.
   var baseCreate = function(prototype) {
-    if (!_.isObject(prototype)) return {}; // 如果prototype不是object类型直接返回空对象
-    if (nativeCreate) return nativeCreate(prototype); // 如果原生支持create则用原生的
-    Ctor.prototype = prototype; // 将prototype赋值为Ctor构造函数的原型
-    var result = new Ctor; // 创建一个Ctor实例对象
-    Ctor.prototype = null; // 为了下一次使用，将原型清空
-    return result; // 最后将实例返回
+    if (!_.isObject(prototype)) return {};
+    if (nativeCreate) return nativeCreate(prototype);
+    Ctor.prototype = prototype;
+    var result = new Ctor;
+    Ctor.prototype = null;
+    return result;
   };
-
-  // 返回一个能够读取obj对象的key属性的函数
 
   var property = function(key) {
     return function(obj) {
-      return obj == null ? void 0 : obj[key]; // 如果传入的obj为null或者undefined就返回undefined,否则返回obj的key属性
+      return obj == null ? void 0 : obj[key];
     };
   };
 
@@ -176,10 +147,6 @@
   // Avoids a very nasty iOS 8 JIT bug on ARM-64. #2094
   var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
   var getLength = property('length');
-
-  // 判断对象是否为类数组
-  // 判断的依据是对象含有的length属性值是否是有意义的正数
-
   var isArrayLike = function(collection) {
     var length = getLength(collection);
     return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
@@ -306,14 +273,12 @@
     return false;
   };
 
-  // 判断obj中是否含有item这个值
-
   // Determine if the array or object contains a given item (using `===`).
   // Aliased as `includes` and `include`.
   _.contains = _.includes = _.include = function(obj, item, fromIndex, guard) {
-    if (!isArrayLike(obj)) obj = _.values(obj); // 如果obj不是类数组，就取对象的值拼成数组
-    if (typeof fromIndex != 'number' || guard) fromIndex = 0; // 默认fromIndex传入的不是数字就从0的位置开始查找，(guard后续分析到再看)
-    return _.indexOf(obj, item, fromIndex) >= 0; // 判断调用indexOf方法返回查找后的索引值是否大于0(indexOf调用后不存在返回-1)
+    if (!isArrayLike(obj)) obj = _.values(obj);
+    if (typeof fromIndex != 'number' || guard) fromIndex = 0;
+    return _.indexOf(obj, item, fromIndex) >= 0;
   };
 
   // Invoke a method (with arguments) on every item in a collection.
@@ -498,20 +463,14 @@
   // Array Functions
   // ---------------
 
-  // 一个能够返回数组前n个元素的函数，默认是1
-
   // Get the first element of an array. Passing **n** will return the first N
   // values in the array. Aliased as `head` and `take`. The **guard** check
   // allows it to work with `_.map`.
   _.first = _.head = _.take = function(array, n, guard) {
-    if (array == null) return void 0; // 如果array为空直接返回undefined
-    if (n == null || guard) return array[0]; //如果没传n，直接返回数组第一个值
-    return _.initial(array, array.length - n); // 结合initial，相当于(slice(0, array.length - (array.length - n))) => slice(0, n)
+    if (array == null) return void 0;
+    if (n == null || guard) return array[0];
+    return _.initial(array, array.length - n);
   };
-
-  // 一个能够返回排除数组后面n个元素的数组的函数，默认是1
-  // (n == null || guard ? 1 : n) 的结果是1或者n，至于n有什么作用到后面我们会说！！！先埋一个坑
-  // Math.max其实是防止(array.length - x)减出来是个负数，如果是负数则取0
 
   // Returns everything but the last entry of the array. Especially useful on
   // the arguments object. Passing **n** will return all the values in
@@ -520,8 +479,6 @@
     return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
   };
 
-  // 一个获取数组最后n个元素构成的数组，默认是最后一位
-
   // Get the last element of an array. Passing **n** will return the last N
   // values in the array.
   _.last = function(array, n, guard) {
@@ -529,8 +486,6 @@
     if (n == null || guard) return array[array.length - 1];
     return _.rest(array, Math.max(0, array.length - n));
   };
-
-  // 一个能够返回数组第n个元素之后的元素构成的数组，注意不包含第n个元素
 
   // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
   // Especially useful on the arguments object. Passing an **n** will return
@@ -544,20 +499,22 @@
     return _.filter(array, _.identity);
   };
 
+  // 将一个嵌套多层的数组转化为只有一层的数组，如果你传递 shallow参数，数组将进行一维的嵌套
+
   // Internal implementation of a recursive `flatten` function.
   var flatten = function(input, shallow, strict, startIndex) {
     var output = [], idx = 0;
-    for (var i = startIndex || 0, length = getLength(input); i < length; i++) {
+    for (var i = startIndex || 0, length = getLength(input); i < length; i++) { // 对数组进行遍历
       var value = input[i];
-      if (isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) {
+      if (isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) { // 如果是数组或者arguments对象则进行进一步判断
         //flatten current level of array or arguments object
-        if (!shallow) value = flatten(value, shallow, strict);
-        var j = 0, len = value.length;
+        if (!shallow) value = flatten(value, shallow, strict); // shallow决定是否进行深度铺平，如果为false，则进行递归，一层层铺平
+        var j = 0, len = value.length; // 否则直接将数组的值，添加在output上，而不会再理会value中是否有值为数组
         output.length += len;
         while (j < len) {
           output[idx++] = value[j++];
         }
-      } else if (!strict) {
+      } else if (!strict) { // 否则直接给output赋值，并且给idx索引增1
         output[idx++] = value;
       }
     }
@@ -653,19 +610,15 @@
     return result;
   };
 
-  // 将数组转化为对象
-  // 1. ([[], []])
-  // 2. ([], [])
-
   // Converts lists into objects. Pass either a single array of `[key, value]`
   // pairs, or two parallel arrays of the same length -- one of keys, and one of
   // the corresponding values.
   _.object = function(list, values) {
     var result = {};
     for (var i = 0, length = getLength(list); i < length; i++) {
-      if (values) { // 对应情况2的调用方式
+      if (values) {
         result[list[i]] = values[i];
-      } else { // 对应情况1的调用方式
+      } else {
         result[list[i][0]] = list[i][1];
       }
     }
@@ -734,10 +687,6 @@
   _.indexOf = createIndexFinder(1, _.findIndex, _.sortedIndex);
   _.lastIndexOf = createIndexFinder(-1, _.findLastIndex);
 
-  // 一个用来创建整数灵活编号的函数
-  // _.range(10) [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
-  // _.range(0, 10, 3) [ 0, 3, 6, 9 ]
-
   // Generate an integer Array containing an arithmetic progression. A port of
   // the native Python `range()` function. See
   // [the Python documentation](http://docs.python.org/library/functions.html#range).
@@ -746,9 +695,9 @@
       stop = start || 0;
       start = 0;
     }
-    step = step || 1; // 做一些参数的处理
+    step = step || 1;
 
-    var length = Math.max(Math.ceil((stop - start) / step), 0); // Math.ceil处理针对(10/3)除不尽的情况，并且需要向上取整
+    var length = Math.max(Math.ceil((stop - start) / step), 0);
     var range = Array(length);
 
     for (var idx = 0; idx < length; idx++, start += step) {
@@ -968,59 +917,48 @@
   // ----------------
 
   // Keys in IE < 9 that won't be iterated by `for key in ...` and thus missed.
-  var hasEnumBug = !{toString: null}.propertyIsEnumerable('toString'); // 判断浏览器是否存在枚举bug，如果有，在取反操作前会返回false
+  var hasEnumBug = !{toString: null}.propertyIsEnumerable('toString');
   var nonEnumerableProps = ['valueOf', 'isPrototypeOf', 'toString',
-                      'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString']; // 所有需要处理的可能存在枚举问题的属性
-
-  // 处理ie9以下的一个枚举bug
+                      'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString'];
 
   function collectNonEnumProps(obj, keys) {
     var nonEnumIdx = nonEnumerableProps.length;
     var constructor = obj.constructor;
-    var proto = (_.isFunction(constructor) && constructor.prototype) || ObjProto;  // 读取obj的原型
+    var proto = (_.isFunction(constructor) && constructor.prototype) || ObjProto;
 
     // Constructor is a special case.
-    var prop = 'constructor'; // 这里我也有个疑问，对于constructor属性为什么要单独处理？
+    var prop = 'constructor';
     if (_.has(obj, prop) && !_.contains(keys, prop)) keys.push(prop);
 
     while (nonEnumIdx--) {
       prop = nonEnumerableProps[nonEnumIdx];
-      if (prop in obj && obj[prop] !== proto[prop] && !_.contains(keys, prop)) { // nonEnumerableProps中的属性出现在obj中，并且不是原型中，再者keys中不存在，就添加进去
+      if (prop in obj && obj[prop] !== proto[prop] && !_.contains(keys, prop)) {
         keys.push(prop);
       }
     }
   }
 
-  // 获取对象obj的所有键
-  // 这里的键不包括原型上的
-
   // Retrieve the names of an object's own properties.
   // Delegates to **ECMAScript 5**'s native `Object.keys`
   _.keys = function(obj) {
-    if (!_.isObject(obj)) return []; // 如果obj不是object类型直接返回空数组
-    if (nativeKeys) return nativeKeys(obj); // 如果浏览器支持原生的keys方法，则使用原生的keys
+    if (!_.isObject(obj)) return [];
+    if (nativeKeys) return nativeKeys(obj);
     var keys = [];
-    for (var key in obj) if (_.has(obj, key)) keys.push(key); // 注意这里1、for in会遍历原型上的键，所以用_.has来确保读取的只是对象本身的属性
+    for (var key in obj) if (_.has(obj, key)) keys.push(key);
     // Ahem, IE < 9.
-    if (hasEnumBug) collectNonEnumProps(obj, keys); // 这里主要处理ie9以下的浏览器的bug，会将对象上一些本该枚举的属性认为不可枚举，详细可以看collectNonEnumProps分析
+    if (hasEnumBug) collectNonEnumProps(obj, keys);
     return keys;
   };
-
-  // 获取对象obj的所有的键
-  // 与keys不同，这里包括继承来的key
 
   // Retrieve all the property names of an object.
   _.allKeys = function(obj) {
     if (!_.isObject(obj)) return [];
     var keys = [];
-    for (var key in obj) keys.push(key); // 直接读遍历取到的key，包括原型上的
+    for (var key in obj) keys.push(key);
     // Ahem, IE < 9.
-    if (hasEnumBug) collectNonEnumProps(obj, keys); // 同样处理一下有枚举问题的浏览器
+    if (hasEnumBug) collectNonEnumProps(obj, keys);
     return keys;
   };
-
-  // 获取对象obj所有值(上面是获取键)
-  // 注意这里不包括原型上的值，仅仅是obj自身的属性
 
   // Retrieve the values of an object's properties.
   _.values = function(obj) {
@@ -1048,9 +986,6 @@
       return results;
   };
 
-  // 把一个对象转变为一个[key, value]形式的数组。
-  // 实现的思路很简单，获取obj的所有key，生成一个等长的数组，然后进行[key, value]循环操作
-
   // Convert an object into a list of `[key, value]` pairs.
   _.pairs = function(obj) {
     var keys = _.keys(obj);
@@ -1062,9 +997,6 @@
     return pairs;
   };
 
-  // 返回一个object副本，使其键（keys）和值（values）对换
-  // 注意这里必须确保object里所有的值都是唯一的且可以序列号成字符串.
-
   // Invert the keys and values of an object. The values must be serializable.
   _.invert = function(obj) {
     var result = {};
@@ -1075,16 +1007,14 @@
     return result;
   };
 
-  // 返回对象obj中经过排序的函数集
-
   // Return a sorted list of the function names available on the object.
   // Aliased as `methods`
   _.functions = _.methods = function(obj) {
     var names = [];
     for (var key in obj) {
-      if (_.isFunction(obj[key])) names.push(key); // 是函数，就装载进去
+      if (_.isFunction(obj[key])) names.push(key);
     }
-    return names.sort(); // 最后返回经过排序的数组
+    return names.sort();
   };
 
   // Extend a given object with all the properties in passed-in object(s).
@@ -1140,10 +1070,6 @@
   // Fill in a given object with default properties.
   _.defaults = createAssigner(_.allKeys, true);
 
-  // 模拟Object.create,第一个参数是要继承的原型，第二个参数是对象本身的属性
-  // 继承的原型的实现主要利用了baseCreate，下文会解析
-  // 然后将props合并到baseCreate返回的对象
-
   // Creates an object that inherits from the given prototype object.
   // If additional properties are provided then they will be added to the
   // created object.
@@ -1153,18 +1079,11 @@
     return result;
   };
 
-  // 浅拷贝函数
-  // 实现的原理很简单，如果obj是个数组类型，就是直接复制一份
-  // 否则调动_.extend拷贝一份
-
   // Create a (shallow-cloned) duplicate of an object.
   _.clone = function(obj) {
     if (!_.isObject(obj)) return obj;
     return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
   };
-
-  // 用obj作为参数来调用函数interceptor，然后返回object
-  // 经常作为链式调用的一环，对obj进行了某些操作后，又返回obj，方便下一次操作
 
   // Invokes interceptor with the obj, and then returns obj.
   // The primary purpose of this method is to "tap into" a method chain, in
@@ -1174,17 +1093,14 @@
     return obj;
   };
 
-  // 判断attrs对象上的属性是不是全在object中
-  // 注意不仅仅是在object中查找，还包括其原型
-
   // Returns whether an object has a given set of `key:value` pairs.
   _.isMatch = function(object, attrs) {
     var keys = _.keys(attrs), length = keys.length;
     if (object == null) return !length;
-    var obj = Object(object); // 防止object不是对象
+    var obj = Object(object);
     for (var i = 0; i < length; i++) {
       var key = keys[i];
-      if (attrs[key] !== obj[key] || !(key in obj)) return false; // 如果key对应的值不相等 或者key不在object中就返回false（其实是不是先判断key是否在object中会更快?）
+      if (attrs[key] !== obj[key] || !(key in obj)) return false;
     }
     return true;
   };
@@ -1288,24 +1204,18 @@
     return eq(a, b);
   };
 
-  // 判断obj是否不包含可枚举的属性
-
   // Is a given array, string, or object empty?
   // An "empty" object has no enumerable own-properties.
   _.isEmpty = function(obj) {
     if (obj == null) return true;
-    if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0; // 如果是类数组直接判断length长度是否为0
-    return _.keys(obj).length === 0; // 如果是对象，则先获取自身的keys，在判断length长度是否为0来确定
+    if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0;
+    return _.keys(obj).length === 0;
   };
-
-  // 判断obj是不是dom元素，主要通过nodeType来做检测
 
   // Is a given value a DOM element?
   _.isElement = function(obj) {
     return !!(obj && obj.nodeType === 1);
   };
-
-  // 判断obj是否是数组
 
   // Is a given value an array?
   // Delegates to ECMA5's native Array.isArray
@@ -1313,17 +1223,11 @@
     return toString.call(obj) === '[object Array]';
   };
 
-  // 判断obj是不是对象
-  // 注意不是判断Object类型，js中函数也是个对象
-  // 注意!!obj 这里是为了排除null (typeof null => object)
-
   // Is a given variable an object?
   _.isObject = function(obj) {
     var type = typeof obj;
     return type === 'function' || type === 'object' && !!obj;
   };
-
-  // 判断obj是否是'Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error'函数
 
   // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError.
   _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error'], function(name) {
@@ -1331,8 +1235,6 @@
       return toString.call(obj) === '[object ' + name + ']';
     };
   });
-
-  // 有些浏览器(例如<ie9)没有Arguments这种类型，通过检测是否有callee属性来判断是否是Arguments
 
   // Define a fallback version of the method in browsers (ahem, IE < 9), where
   // there isn't any inspectable "Arguments" type.
@@ -1350,49 +1252,30 @@
     };
   }
 
-  // 判断obj是否是无穷大，这里使用了原生的isFinite函数
-  // 后面还对NaN做了排除，作用何在？兼容？
-
   // Is a given object a finite number?
   _.isFinite = function(obj) {
     return isFinite(obj) && !isNaN(parseFloat(obj));
   };
 
-  // 判断obj是不是NaN(注意这里和原生的isNaN的作用和含义是不一样的)
-  // 符合NaN的条件是：为数字，并且不等于自身(那只有NaN了)
-
   // Is the given value `NaN`? (NaN is the only number which does not equal itself).
   _.isNaN = function(obj) {
-    return _.isNumber(obj) && obj !== +obj; // +'1' => 1 将obj转化为数字的方法之一
+    return _.isNumber(obj) && obj !== +obj;
   };
-
-  // 判断是否是布尔类型
-  // 布尔类型不是true or false嘛，为啥还要加最后的判断呢？亦或是只用最后的判断是不是也可以
 
   // Is a given value a boolean?
   _.isBoolean = function(obj) {
     return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
   };
 
-  // 判断obj是否是null
-  // 注意这里的三等号，意味着只判断null，不包括undefined
-
   // Is a given value equal to null?
   _.isNull = function(obj) {
     return obj === null;
   };
 
-  // 判断obj是否为undefined
-  // 注意这里的三等号，意味着只判断undefined，不包括null
-  // void 0  执行完之后返回undefined，正好用来做判断
-
   // Is a given variable undefined?
   _.isUndefined = function(obj) {
     return obj === void 0;
   };
-
-  // 判断obj是否拥有key属性
-  // 仅仅在对象自身查找，不涉及原型
 
   // Shortcut function for checking if an object has a given property directly
   // on itself (in other words, not on a prototype).
@@ -1403,16 +1286,12 @@
   // Utility Functions
   // -----------------
 
-  // 防止全局变量冲突的非常经典的解决方案
-
   // Run Underscore.js in *noConflict* mode, returning the `_` variable to its
   // previous owner. Returns a reference to the Underscore object.
   _.noConflict = function() {
-    root._ = previousUnderscore; // 将previousUnderscore(_)重新赋值给全局对象
-    return this; // 并将_返回以供使用
+    root._ = previousUnderscore;
+    return this;
   };
-
-  // 一个返回自身参数的函数，作为underscore.js默认的迭代器存在
 
   // Keep the identity function around for default iteratees.
   _.identity = function(value) {
@@ -1430,9 +1309,6 @@
 
   _.property = property;
 
-  // 与property函数相反
-  // 返回一个函数，专门用来读取obj对象的属性
-
   // Generates a function for a given object that returns a given property.
   _.propertyOf = function(obj) {
     return obj == null ? function(){} : function(key) {
@@ -1440,14 +1316,12 @@
     };
   };
 
-  // 返回一个断言函数(返回值是布尔类型的函数)
-
   // Returns a predicate for checking whether an object has a given set of
   // `key:value` pairs.
   _.matcher = _.matches = function(attrs) {
-    attrs = _.extendOwn({}, attrs); // 本地先保存一份attrs的副本
+    attrs = _.extendOwn({}, attrs);
     return function(obj) {
-      return _.isMatch(obj, attrs); // 判断attrs是否全在obj中
+      return _.isMatch(obj, attrs);
     };
   };
 
@@ -1459,9 +1333,6 @@
     return accum;
   };
 
-  // random随机函数，返回[min, max)之间的一个整数
-  // 如果没有传max，则默认从0开始计算
-
   // Return a random integer between min and max (inclusive).
   _.random = function(min, max) {
     if (max == null) {
@@ -1470,9 +1341,6 @@
     }
     return min + Math.floor(Math.random() * (max - min + 1));
   };
-
-  // 得到系统时间戳
-  // 如果浏览器支持Date.now则用其，不支持就自己实现
 
   // A (possibly faster) way to get the current timestamp as an integer.
   _.now = Date.now || function() {
@@ -1516,8 +1384,6 @@
     }
     return _.isFunction(value) ? value.call(object) : value;
   };
-
-  // 生成唯一id
 
   // Generate a unique integer id (unique within the entire client session).
   // Useful for temporary DOM ids.
