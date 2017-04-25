@@ -188,17 +188,19 @@
   // Collection Functions
   // --------------------
 
+  // 模拟数组的forEach方式
+
   // The cornerstone, an `each` implementation, aka `forEach`.
   // Handles raw objects in addition to array-likes. Treats all
   // sparse array-likes as if they were dense.
   _.each = _.forEach = function(obj, iteratee, context) {
-    iteratee = optimizeCb(iteratee, context);
+    iteratee = optimizeCb(iteratee, context); // 绑定作用后的函数
     var i, length;
-    if (isArrayLike(obj)) {
+    if (isArrayLike(obj)) { // 如果是类数组类型的obj
       for (i = 0, length = obj.length; i < length; i++) {
         iteratee(obj[i], i, obj);
       }
-    } else {
+    } else { // 支持对象类型的数据迭代
       var keys = _.keys(obj);
       for (i = 0, length = keys.length; i < length; i++) {
         iteratee(obj[keys[i]], keys[i], obj);
@@ -266,6 +268,9 @@
     if (key !== void 0 && key !== -1) return obj[key];
   };
 
+  // 模拟数组原生的filter方法
+  // 原理很简单就是返回一个新的数组，数组中的值是回调中经过帅选条件后的值
+
   // Return all the elements that pass a truth test.
   // Aliased as `select`.
   _.filter = _.select = function(obj, predicate, context) {
@@ -276,6 +281,9 @@
     });
     return results;
   };
+
+  // 与filter功能相反
+  // 过滤出不满足的条件的元素
 
   // Return all the elements for which a truth test fails.
   _.reject = function(obj, predicate, context) {
