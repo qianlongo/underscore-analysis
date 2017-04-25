@@ -584,6 +584,9 @@
     return flatten(array, shallow, false);
   };
 
+  // 返回一个删除所有values值后的 array副本
+  // 作用何difference类似，只不过difference要求只穿函数
+
   // Return a version of the array that does not contain the specified value(s).
   _.without = function(array) {
     return _.difference(array, slice.call(arguments, 1));
