@@ -549,6 +549,9 @@
     return slice.call(array, n == null || guard ? 1 : n);
   };
 
+  // 返回筛选掉数组的值为false副本
+  // 这个时候_.identity的作用体现了
+
   // Trim out all falsy values from an array.
   _.compact = function(array) {
     return _.filter(array, _.identity);
@@ -650,12 +653,14 @@
     return result;
   };
 
+  // 返回array中，其他的数组中不存在的值
+
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
-    var rest = flatten(arguments, true, true, 1);
+    var rest = flatten(arguments, true, true, 1); // 先将第一个参数之后的输入值铺平为一维数组
     return _.filter(array, function(value){
-      return !_.contains(rest, value);
+      return !_.contains(rest, value); // 帅选array的值，不在铺平后的rest中
     });
   };
 
