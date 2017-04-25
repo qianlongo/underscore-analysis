@@ -586,6 +586,10 @@
     return _.difference(array, slice.call(arguments, 1));
   };
 
+  // 返回 array去重后的副本, 使用 === 做相等测试.
+  // 如果您确定 array 已经排序, 那么给 isSorted 参数传递 true值, 此函数将运行的更快的算法.
+  // 如果要处理对象元素, 传递 iteratee函数来获取要对比的属性.
+
   // Produce a duplicate-free version of the array. If the array has already
   // been sorted, you have the option of using a faster algorithm.
   // Aliased as `unique`.
@@ -597,19 +601,19 @@
     }
     if (iteratee != null) iteratee = cb(iteratee, context);
     var result = [];
-    var seen = [];
+    var seen = []; // 这里之前做一些参数处理
     for (var i = 0, length = getLength(array); i < length; i++) {
       var value = array[i],
           computed = iteratee ? iteratee(value, i, array) : value;
-      if (isSorted) {
+      if (isSorted) { // 因为已经确定了是排序过了 所以只需要和上一个数比较就好
         if (!i || seen !== computed) result.push(value);
         seen = computed;
-      } else if (iteratee) {
-        if (!_.contains(seen, computed)) {
+      } else if (iteratee) { // 如果是回调函数的形式
+        if (!_.contains(seen, computed)) { // seen用来缓存已经比较过的值
           seen.push(computed);
-          result.push(value);
+          result.push(value); // 缓存seen中没有则将数组中的值添加进去，从而达到去重
         }
-      } else if (!_.contains(result, value)) {
+      } else if (!_.contains(result, value)) { // 这种场景最简单 _.uniq([1, 2, 1, 3, 1, 4]) => [1, 2, 3, 4]
         result.push(value);
       }
     }
