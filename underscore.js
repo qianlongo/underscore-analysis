@@ -207,15 +207,17 @@
     return obj;
   };
 
+  // 模拟原生数组的map方法，不同之处在于其还可以对对象起作用
+
   // Return the results of applying the iteratee to each element.
   _.map = _.collect = function(obj, iteratee, context) {
-    iteratee = cb(iteratee, context);
-    var keys = !isArrayLike(obj) && _.keys(obj),
+    iteratee = cb(iteratee, context); // 老规矩，先进行一下作用域绑定
+    var keys = !isArrayLike(obj) && _.keys(obj),  // 非类数组对象就用keys读取obj的key
         length = (keys || obj).length,
         results = Array(length);
     for (var index = 0; index < length; index++) {
-      var currentKey = keys ? keys[index] : index;
-      results[index] = iteratee(obj[currentKey], currentKey, obj);
+      var currentKey = keys ? keys[index] : index; // 数组是0，1，2 对象是对应的key
+      results[index] = iteratee(obj[currentKey], currentKey, obj); // 拿到回调的返回值给result赋值
     }
     return results;
   };
@@ -1130,12 +1132,17 @@
     return result; // 得到结果
   };
 
+  // 和pick刚好相反
+  // 返回一个object副本
+  // 只过滤出除去keys(有效的键组成的数组)参数指定的属性值
+  // 或者接受一个判断函数，指定忽略哪个key
+
    // Return a copy of the object without the blacklisted properties.
   _.omit = function(obj, iteratee, context) {
     if (_.isFunction(iteratee)) {
-      iteratee = _.negate(iteratee);
+      iteratee = _.negate(iteratee); // negate
     } else {
-      var keys = _.map(flatten(arguments, false, false, 1), String);
+      var keys = _.map(flatten(arguments, false, false, 1), String); // //把arguments其余参数转化成字符串
       iteratee = function(value, key) {
         return !_.contains(keys, key);
       };
