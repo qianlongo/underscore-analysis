@@ -1106,24 +1106,28 @@
     }
   };
 
+  // 返回object的一个副本
+  // 特征是过滤出pick(obj, 'key1', 'key2'), key1, key2指定的属性值
+  // 或者接收一个函数来指定挑选哪一个
+
   // Return a copy of the object only containing the whitelisted properties.
   _.pick = function(object, oiteratee, context) {
     var result = {}, obj = object, iteratee, keys;
     if (obj == null) return result;
-    if (_.isFunction(oiteratee)) {
-      keys = _.allKeys(obj);
-      iteratee = optimizeCb(oiteratee, context);
+    if (_.isFunction(oiteratee)) { // 如果oiteratee是一个函数
+      keys = _.allKeys(obj); // 取出obj所有的key，包括原上的
+      iteratee = optimizeCb(oiteratee, context); // 绑定一下this作用域，返回的还是一个函数
     } else {
-      keys = flatten(arguments, false, false, 1);
+      keys = flatten(arguments, false, false, 1); // 否则将arguments铺平，得到要挑选的key
       iteratee = function(value, key, obj) { return key in obj; };
       obj = Object(obj);
     }
-    for (var i = 0, length = keys.length; i < length; i++) {
+    for (var i = 0, length = keys.length; i < length; i++) { // 进行循环处理
       var key = keys[i];
       var value = obj[key];
       if (iteratee(value, key, obj)) result[key] = value;
     }
-    return result;
+    return result; // 得到结果
   };
 
    // Return a copy of the object without the blacklisted properties.
