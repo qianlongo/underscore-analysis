@@ -620,11 +620,19 @@
     return result;
   };
 
+  // 返回传入的数组的并集
+  // 原理很简单，先将所有传入的数组铺平得到一维的数组
+  // 再进行去重，便得到并集
+
   // Produce an array that contains the union: each distinct element from all of
   // the passed-in arrays.
   _.union = function() {
     return _.uniq(flatten(arguments, true, true));
   };
+
+  // 返回传入 arrays（数组）交集
+  // 既然是交集，肯定返回值在每个传入的数组中都存在
+  // 其实我想是不是先找出传入的数组中length最短的那个，在进行后续的比较整个计算时间会短一点？
 
   // Produce an array that contains every item shared between all the
   // passed-in arrays.
