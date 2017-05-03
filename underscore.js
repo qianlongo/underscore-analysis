@@ -336,9 +336,11 @@
     });
   };
 
+  // 可以看做是map的简化版，用来获取数组中对象的某一属性值，最后返回该属性值的集合
+
   // Convenience version of a common use case of `map`: fetching a property.
   _.pluck = function(obj, key) {
-    return _.map(obj, _.property(key));
+    return _.map(obj, _.property(key)); // _.property(key)函数，返回一个能够获取obj对象key属性的函数
   };
 
   // Convenience version of a common use case of `filter`: selecting only objects
@@ -676,11 +678,19 @@
     });
   };
 
+  // 和unzip的功能是一致的，区别在于使用方式
+  // _.unzip([[], [], []])
+  // _.zip([], [], [])
+
   // Zip together multiple lists into a single array -- elements that share
   // an index go together.
   _.zip = function() {
     return _.unzip(arguments);
   };
+
+  // 将每个arrays中相应位置的值合并在一起,类似下面的用法
+  // [['moe', 'larry', 'curly'], [30, 40, 50], [true, false, false]]
+  //  [["moe", 30, true], ["larry", 40, false], ["curly", 50, false]]
 
   // Complement of _.zip. Unzip accepts an array of arrays and groups
   // each array's elements on shared indices
