@@ -723,6 +723,10 @@
     return result;
   };
 
+  // 创建findIndex和findLastIndex的函数封装
+  // findIndex从0开始查找
+  // findLastIndex从数组的length - 1开始查找
+
   // Generator function to create the findIndex and findLastIndex functions
   function createPredicateIndexFinder(dir) {
     return function(array, predicate, context) {
@@ -740,6 +744,9 @@
   _.findIndex = createPredicateIndexFinder(1);
   _.findLastIndex = createPredicateIndexFinder(-1);
 
+  // 使用二分查找法找寻指定值在array中的位置
+  // 要搜索的obj不一定在array中，返回的index是值比较近的较小的index
+
   // Use a comparator function to figure out the smallest index at which
   // an object should be inserted so as to maintain order. Uses binary search.
   _.sortedIndex = function(array, obj, iteratee, context) {
@@ -752,6 +759,8 @@
     }
     return low;
   };
+
+  // 创建indexOf和lastIndexOf的函数封装
 
   // Generator function to create the indexOf and lastIndexOf functions
   function createIndexFinder(dir, predicateFind, sortedIndex) {
