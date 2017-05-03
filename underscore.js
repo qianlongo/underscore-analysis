@@ -472,17 +472,26 @@
     };
   };
 
+  // 将一个集合分组为多个集合
+  // 通过 iterator 返回的结果进行分组
+  // 如果 iterator 是一个字符串而不是函数, 那么将使用 iterator 作为各元素的属性名来对比进行分组.
+
   // Groups the object's values by a criterion. Pass either a string attribute
   // to group by, or a function that returns the criterion.
   _.groupBy = group(function(result, value, key) {
     if (_.has(result, key)) result[key].push(value); else result[key] = [value];
   });
 
+  // 和groupBy非常像
+  // 不同的是如果知道obj的键是唯一的时候，可以用indexBy
+
   // Indexes the object's values by a criterion, similar to `groupBy`, but for
   // when you know that your index values will be unique.
   _.indexBy = group(function(result, value, key) {
     result[key] = value;
   });
+
+  // 返回各组中的对象的数量的计数
 
   // Counts instances of an object that group by a certain criterion. Pass
   // either a string attribute to count by, or a function that returns the
@@ -491,13 +500,19 @@
     if (_.has(result, key)) result[key]++; else result[key] = 1;
   });
 
+  // 将obj转化为数组
+
   // Safely create a real, live array from anything iterable.
   _.toArray = function(obj) {
     if (!obj) return [];
-    if (_.isArray(obj)) return slice.call(obj);
-    if (isArrayLike(obj)) return _.map(obj, _.identity);
-    return _.values(obj);
+    if (_.isArray(obj)) return slice.call(obj); // 如果是数组 拷贝一份返回
+    if (isArrayLike(obj)) return _.map(obj, _.identity); // 如果是类数组，使用map操作之后的数组返回
+    return _.values(obj); // 其他情况获取values返回
   };
+
+  // 返回obj的长度
+  // 如果是类数组，直接返回length长度
+  // 否则先获取keys，在返回长度
 
   // Return the number of elements in an object.
   _.size = function(obj) {
