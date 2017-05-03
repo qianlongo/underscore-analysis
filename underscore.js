@@ -353,23 +353,27 @@
     return _.find(obj, _.matcher(attrs));
   };
 
+  // 返回obj中的最大值。
+  // 如果传递iteratee参数，iteratee将作为obj中每个值的排序依据。
+  // 如果obj为空，将返回-Infinity，所以你可能需要事先用isEmpty检查 obj
+
   // Return the maximum element (or element-based computation).
   _.max = function(obj, iteratee, context) {
     var result = -Infinity, lastComputed = -Infinity,
         value, computed;
-    if (iteratee == null && obj != null) {
-      obj = isArrayLike(obj) ? obj : _.values(obj);
+    if (iteratee == null && obj != null) { // 针对没有传入iteratee的情况
+      obj = isArrayLike(obj) ? obj : _.values(obj); // 如果是类数组则直接进行下面的比较，否则拿到obj的values值得集合
       for (var i = 0, length = obj.length; i < length; i++) {
         value = obj[i];
         if (value > result) {
           result = value;
         }
       }
-    } else {
-      iteratee = cb(iteratee, context);
+    } else { // 如果传了回调函数
+      iteratee = cb(iteratee, context); // 绑定this作用域
       _.each(obj, function(value, index, list) {
-        computed = iteratee(value, index, list);
-        if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
+        computed = iteratee(value, index, list); // 获取计算后的值
+        if (computed > lastComputed || computed === -Infinity && result === -Infinity) { // 最后一个或运算是为了保证例如[{age: -Infinity}]类型，最后需要返回{age: -Infinity}，而不是-Infinity
           result = value;
           lastComputed = computed;
         }
@@ -377,6 +381,11 @@
     }
     return result;
   };
+
+  // 返回obj中的小值。
+  // 如果传递iteratee参数，iteratee将作为obj中每个值的排序依据。
+  // 如果obj为空，将返回-Infinity，所以你可能需要事先用isEmpty检查 obj
+  // 分析方法和max几乎一样
 
   // Return the minimum element (or element-based computation).
   _.min = function(obj, iteratee, context) {
