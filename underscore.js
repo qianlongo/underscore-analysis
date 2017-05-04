@@ -448,16 +448,22 @@
     return shuffled;
   };
 
+  // 从obj中返回一个随机打乱的obj副本
+  // 如果没有传入n，则随机返回obj中的一个值
+  // 如果传入了先随机打乱，再返回前n个值
+
   // Sample **n** random values from a collection.
   // If **n** is not specified, returns a single random element.
   // The internal `guard` argument allows it to work with `map`.
   _.sample = function(obj, n, guard) {
     if (n == null || guard) {
       if (!isArrayLike(obj)) obj = _.values(obj);
-      return obj[_.random(obj.length - 1)];
+      return obj[_.random(obj.length - 1)]; // 对应返回其中一个值的情况
     }
-    return _.shuffle(obj).slice(0, Math.max(0, n));
+    return _.shuffle(obj).slice(0, Math.max(0, n)); // 对应返回n个随机值的情况
   };
+
+  // 返回一个排序之后的obj的副本
 
   // Sort the object's values by a criterion produced by an iteratee.
   _.sortBy = function(obj, iteratee, context) {
@@ -468,7 +474,7 @@
         index: index,
         criteria: iteratee(value, index, list)
       };
-    }).sort(function(left, right) {
+    }).sort(function(left, right) { // 这里后续还需要自己研读
       var a = left.criteria;
       var b = right.criteria;
       if (a !== b) {
