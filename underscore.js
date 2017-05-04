@@ -224,35 +224,43 @@
     return results;
   };
 
+  // 用来创建reduce、reduceRight的函数
+  // 最后reduce、reduceRight不仅仅支持数组，对象也支持
+  // 看着比较复杂，但其实在理解原生的reduce和reduceRight的基础上去看这个函数还是很清晰的
+
   // Create a reducing function iterating left or right.
   function createReduce(dir) {
     // Optimized iterator function as using arguments.length
     // in the main function will deoptimize the, see #1991.
-    function iterator(obj, iteratee, memo, keys, index, length) {
+    function iterator(obj, iteratee, memo, keys, index, length) { // 真正执行迭代的地方
       for (; index >= 0 && index < length; index += dir) {
-        var currentKey = keys ? keys[index] : index;
-        memo = iteratee(memo, obj[currentKey], currentKey, obj);
+        var currentKey = keys ? keys[index] : index; // 如果keys存在则认为是obj形式的参数，所以读取keys中的属性值，否则类数组只需要读取索引index即可
+        memo = iteratee(memo, obj[currentKey], currentKey, obj); // 接着就是执行外部传入的回调了，并将结果赋值为memo，也就是我们最后要到的值
       }
       return memo;
     }
 
     return function(obj, iteratee, memo, context) {
-      iteratee = optimizeCb(iteratee, context, 4);
-      var keys = !isArrayLike(obj) && _.keys(obj),
+      iteratee = optimizeCb(iteratee, context, 4); // 首先绑定一下this作用域
+      var keys = !isArrayLike(obj) && _.keys(obj), // 如果不是类数组就读取其keys
           length = (keys || obj).length,
-          index = dir > 0 ? 0 : length - 1;
+          index = dir > 0 ? 0 : length - 1; // 默认开始迭代的位置，从左边第一个开始还是右边第一个
       // Determine the initial value if none is provided.
-      if (arguments.length < 3) {
+      if (arguments.length < 3) { // 如果没有传入初始化值，则将第一个值(左边第一个或者右边第一个)作为初始值
         memo = obj[keys ? keys[index] : index];
-        index += dir;
+        index += dir; // 从索引为1开始或者索引为length - 2开始迭代
       }
-      return iterator(obj, iteratee, memo, keys, index, length);
+      return iterator(obj, iteratee, memo, keys, index, length); // 接着开始进入自定义的迭代函数，请往上看
     };
   }
+
+  // 模拟数组的reduce函数，将数组或者对象中的元素进行处理，最后得到一个值
 
   // **Reduce** builds up a single result from a list of values, aka `inject`,
   // or `foldl`.
   _.reduce = _.foldl = _.inject = createReduce(1);
+
+  // // 模拟数组的reduceRight函数，将数组或者对象中的元素进行处理，最后得到一个值
 
   // The right-associative version of reduce, also known as `foldr`.
   _.reduceRight = _.foldr = createReduce(-1);
@@ -546,13 +554,17 @@
     return isArrayLike(obj) ? obj.length : _.keys(obj).length;
   };
 
+  // 分区：拆分一个数组为一个含有两个数组元素的二维数组
+  // 其中第一个数组是通过了predicate判断的
+  // 第二个则是未通过的
+
   // Split a collection into two arrays: one whose elements all satisfy the given
   // predicate, and one whose elements all do not satisfy the predicate.
   _.partition = function(obj, predicate, context) {
     predicate = cb(predicate, context);
-    var pass = [], fail = [];
+    var pass = [], fail = []; // 准备好了两个容器来装通过和未通过的元素
     _.each(obj, function(value, key, obj) {
-      (predicate(value, key, obj) ? pass : fail).push(value);
+      (predicate(value, key, obj) ? pass : fail).push(value); // 通过 ？ 往pass里面添加元素 : 往fail里面添加
     });
     return [pass, fail];
   };
