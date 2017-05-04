@@ -877,20 +877,23 @@
   // Determines whether to execute a function as a constructor
   // or a normal function with the provided arguments
   var executeBound = function(sourceFunc, boundFunc, context, callingContext, args) {
-    if (!(callingContext instanceof boundFunc)) return sourceFunc.apply(context, args);
-    var self = baseCreate(sourceFunc.prototype);
+    if (!(callingContext instanceof boundFunc)) return sourceFunc.apply(context, args); // 如果调用方式不是new func的形式就直接调用sourceFunc，并且给到对应的参数即可
+    var self = baseCreate(sourceFunc.prototype); // 处理new调用的形式
     var result = sourceFunc.apply(self, args);
     if (_.isObject(result)) return result;
     return self;
   };
 
+  // 绑定函数 func 到对象 context 上,
+  // 也就是无论何时调用函数, 函数里的 this 都指向这个 context.
+
   // Create a function bound to a given object (assigning `this`, and arguments,
   // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
   // available.
   _.bind = function(func, context) {
-    if (nativeBind && func.bind === nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
-    if (!_.isFunction(func)) throw new TypeError('Bind must be called on a function');
-    var args = slice.call(arguments, 2);
+    if (nativeBind && func.bind === nativeBind) return nativeBind.apply(func, slice.call(arguments, 1)); // 如果原生支持bind函数，就用原生的，并将对应的参数传进去
+    if (!_.isFunction(func)) throw new TypeError('Bind must be called on a function'); // 如果传入的func不是一个函数类型 就抛出异常
+    var args = slice.call(arguments, 2); // 把第三个参数以后的值存起来，接下来请看executeBound
     var bound = function() {
       return executeBound(func, bound, context, this, args.concat(slice.call(arguments)));
     };
