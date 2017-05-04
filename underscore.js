@@ -1108,6 +1108,9 @@
     return values;
   };
 
+  // 作用类似于map，不同的是map返回的是数组
+  // mapObject返回的是对象
+
   // Returns the results of applying the iteratee to each element of the object
   // In contrast to _.map it returns an object
   _.mapObject = function(obj, iteratee, context) {
@@ -1118,7 +1121,7 @@
           currentKey;
       for (var index = 0; index < length; index++) {
         currentKey = keys[index];
-        results[currentKey] = iteratee(obj[currentKey], currentKey, obj);
+        results[currentKey] = iteratee(obj[currentKey], currentKey, obj);  // 将原obj的每个key的值转化为经过iteratee处理后的值
       }
       return results;
   };
@@ -1169,11 +1172,14 @@
   // (https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
   _.extendOwn = _.assign = createAssigner(_.keys);
 
+  // 对象版本的findIndex
+  // 如果对象obj中有符合predicate函数执行后的值则将key返回
+
   // Returns the first key on an object that passes a predicate test
   _.findKey = function(obj, predicate, context) {
     predicate = cb(predicate, context);
     var keys = _.keys(obj), key;
-    for (var i = 0, length = keys.length; i < length; i++) {
+    for (var i = 0, length = keys.length; i < length; i++) { // 对对象进行遍历，有符合predicate函数执行的value，则将key返回
       key = keys[i];
       if (predicate(obj[key], key, obj)) return key;
     }
