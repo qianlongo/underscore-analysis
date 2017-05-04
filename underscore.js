@@ -336,13 +336,16 @@
     return _.indexOf(obj, item, fromIndex) >= 0; // 判断调用indexOf方法返回查找后的索引值是否大于0(indexOf调用后不存在返回-1)
   };
 
+  // 在obj的每个元素上执行method方法，第三个参数及之后的每个参数都会传递给method方法
+  // method方法执行时，若没有特殊的处理，内部的this，是obj的每一项
+
   // Invoke a method (with arguments) on every item in a collection.
   _.invoke = function(obj, method) {
     var args = slice.call(arguments, 2);
-    var isFunc = _.isFunction(method);
+    var isFunc = _.isFunction(method); // 先判断一下method是不是一个函数
     return _.map(obj, function(value) {
-      var func = isFunc ? method : value[method];
-      return func == null ? func : func.apply(value, args);
+      var func = isFunc ? method : value[method]; // 如果是函数就直接用，否则去value上读取
+      return func == null ? func : func.apply(value, args); // 最后执行对应的方法，并将结果返回
     });
   };
 
