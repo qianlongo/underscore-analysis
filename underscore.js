@@ -356,11 +356,16 @@
     return _.map(obj, _.property(key)); // _.property(key)函数，返回一个能够获取obj对象key属性的函数
   };
 
+  // 遍历obj中的每一个值, 返回一个数组
+  // 数组中得到的值有一个特性，这些值都包含attrs的值
+
   // Convenience version of a common use case of `filter`: selecting only objects
   // containing specific `key:value` pairs.
   _.where = function(obj, attrs) {
-    return _.filter(obj, _.matcher(attrs));
+    return _.filter(obj, _.matcher(attrs)); // matcher执行后返回的是一个函数
   };
+
+  //遍历obj返回第一个包含attrs值的值
 
   // Convenience version of a common use case of `find`: getting the first object
   // containing specific `key:value` pairs.
@@ -427,16 +432,18 @@
     return result;
   };
 
+  // 返回一个随机打乱的obj副本(最后的返回值是一个数组)
+
   // Shuffle a collection, using the modern version of the
   // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
   _.shuffle = function(obj) {
-    var set = isArrayLike(obj) ? obj : _.values(obj);
+    var set = isArrayLike(obj) ? obj : _.values(obj); // 如果是一个类数组，就直接用obj，否则读取其values
     var length = set.length;
     var shuffled = Array(length);
     for (var index = 0, rand; index < length; index++) {
-      rand = _.random(0, index);
-      if (rand !== index) shuffled[index] = shuffled[rand];
-      shuffled[rand] = set[index];
+      rand = _.random(0, index); // 这里很关键每次都是随机生成[0, index)中的某个值，index为0的时候就只能为0了
+      if (rand !== index) shuffled[index] = shuffled[rand]; // 当随机出来的rand值和当前的index值不相等的时候，就把shuffled中index位置的值设置为rand位置的值
+      shuffled[rand] = set[index]; // 把shuffled中随机出来的rand位置的值设置为obj中index位置的值
     }
     return shuffled;
   };
