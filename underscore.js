@@ -257,6 +257,8 @@
   // The right-associative version of reduce, also known as `foldr`.
   _.reduceRight = _.foldr = createReduce(-1);
 
+  // 在obj中查找，返回第一个通过predicate迭代函数检测的元素值
+
   // Return the first value which passes a truth test. Aliased as `detect`.
   _.find = _.detect = function(obj, predicate, context) {
     var key;
@@ -265,7 +267,7 @@
     } else {
       key = _.findKey(obj, predicate, context);
     }
-    if (key !== void 0 && key !== -1) return obj[key];
+    if (key !== void 0 && key !== -1) return obj[key]; // 返回符合条件的value
   };
 
   // 模拟数组原生的filter方法
@@ -290,18 +292,26 @@
     return _.filter(obj, _.negate(cb(predicate)), context);
   };
 
+  // 判断obj中的所有元素是不是都满足一个条件
+  // 如果都满足就返回true
+  // 只要有一个不满足就返回false
+
   // Determine whether all of the elements match a truth test.
   // Aliased as `all`.
   _.every = _.all = function(obj, predicate, context) {
     predicate = cb(predicate, context);
-    var keys = !isArrayLike(obj) && _.keys(obj),
-        length = (keys || obj).length;
+    var keys = !isArrayLike(obj) && _.keys(obj), // 短路写法，非类数组则获取其keys
+        length = (keys || obj).length; // 获取obj的length
     for (var index = 0; index < length; index++) {
-      var currentKey = keys ? keys[index] : index;
-      if (!predicate(obj[currentKey], currentKey, obj)) return false;
+      var currentKey = keys ? keys[index] : index; // keys若能转化为"真" 则说明obj是对象类型
+      if (!predicate(obj[currentKey], currentKey, obj)) return false; // 只要有一个不满足就返回false，中断迭代
     }
     return true;
   };
+
+  // 判断obj中是不是至少有一个元素满足一个条件
+  // 如果有至少一个满足就返回true
+  // 所有都不满足则返回false
 
   // Determine if at least one element in the object matches a truth test.
   // Aliased as `any`.
@@ -311,7 +321,7 @@
         length = (keys || obj).length;
     for (var index = 0; index < length; index++) {
       var currentKey = keys ? keys[index] : index;
-      if (predicate(obj[currentKey], currentKey, obj)) return true;
+      if (predicate(obj[currentKey], currentKey, obj)) return true; // 只要有一个满足条件就返回true
     }
     return false;
   };
