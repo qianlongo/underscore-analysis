@@ -900,22 +900,29 @@
     return bound;
   };
 
+  // 局部应用一个函数填充在任意个数的arguments
+  // 不改变其动态this值,和bind方法很相近
+  // 可以在partial调用的时传进_来占位，进而用在传进的回调函数实际参数进行替换
+
+
   // Partially apply a function by creating a version that has had some of its
   // arguments pre-filled, without changing its dynamic `this` context. _ acts
   // as a placeholder, allowing any combination of arguments to be pre-filled.
   _.partial = function(func) {
-    var boundArgs = slice.call(arguments, 1);
+    var boundArgs = slice.call(arguments, 1); // 获取除了传进回调函数之外的其他参数
     var bound = function() {
       var position = 0, length = boundArgs.length;
-      var args = Array(length);
-      for (var i = 0; i < length; i++) {
-        args[i] = boundArgs[i] === _ ? arguments[position++] : boundArgs[i];
+      var args = Array(length); // 先创建一个和boundArgs长度等长的空数组
+      for (var i = 0; i < length; i++) { // 处理占位元素_
+        args[i] = boundArgs[i] === _ ? arguments[position++] : boundArgs[i]; // 如果发现boundArgs中有_的占位元素，就依次用arguments中的元素进行替换boundArgs
       }
-      while (position < arguments.length) args.push(arguments[position++]);
+      while (position < arguments.length) args.push(arguments[position++]); // 把auguments中的其他元素添加到boundArgs中
       return executeBound(func, bound, this, this, args);
     };
     return bound;
   };
+
+  // 把methodNames参数指定的一些方法绑定到object上，这些方法就会在对象的上下文环境中执行
 
   // Bind a number of an object's methods to that object. Remaining arguments
   // are the method names to be bound. Useful for ensuring that all callbacks
@@ -923,33 +930,44 @@
   _.bindAll = function(obj) {
     var i, length = arguments.length, key;
     if (length <= 1) throw new Error('bindAll must be passed function names');
-    for (i = 1; i < length; i++) {
+    for (i = 1; i < length; i++) { // 从第一个实参开始处理，这些便是需要绑定this作用域到obj的函数
       key = arguments[i];
-      obj[key] = _.bind(obj[key], obj);
+      obj[key] = _.bind(obj[key], obj); // 调用内部的bind方法进行this绑定
     }
     return obj;
   };
+
+  // memoize函数可以缓存某函数处理之后的结果，对于耗时较长的操作很有帮助
+  // 如果传递了 hashFunction 参数，就用 hashFunction 的返回值作为key存储函数的计算结果
+  // hashFunction 默认使用function的第一个参数作为key
 
   // Memoize an expensive function by storing its results.
   _.memoize = function(func, hasher) {
     var memoize = function(key) {
       var cache = memoize.cache;
-      var address = '' + (hasher ? hasher.apply(this, arguments) : key);
-      if (!_.has(cache, address)) cache[address] = func.apply(this, arguments);
+      var address = '' + (hasher ? hasher.apply(this, arguments) : key); // 注意hasher，如果传了hasher，就用hasher()执行的结果作为缓存func()执行的结果的key
+      if (!_.has(cache, address)) cache[address] = func.apply(this, arguments); // 如果没有在cache中查找到对应的key就去计算一次，并缓存下来
       return cache[address];
     };
     memoize.cache = {};
-    return memoize;
+    return memoize; // 返回一个具有cache静态属性的函数
   };
+
+  // 类似setTimeout，等待wait秒之后调用func。
+  // 如果传递可选的参数arguments，当函数function执行时， arguments 会作为参数传入
 
   // Delays a function for the given number of milliseconds, and then calls
   // it with the arguments supplied.
   _.delay = function(func, wait) {
-    var args = slice.call(arguments, 2);
+    var args = slice.call(arguments, 2); // 读取第三个参数开始的其他参数
     return setTimeout(function(){
-      return func.apply(null, args);
+      return func.apply(null, args); // 执行func并将参数传入
     }, wait);
   };
+
+  // 延迟调用function
+  // 这里使用了_.partial， _.delay，并且有一个_作为函数占位，等待_.defer实际传入
+  // 类似使用延时为0的setTimeout方法。对于执行开销大的计算和无阻塞UI线程的HTML渲染时候非常有用
 
   // Defers a function, scheduling it to run after the current call stack has
   // cleared.
