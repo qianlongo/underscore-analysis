@@ -1793,11 +1793,15 @@
     return template;
   };
 
+  // 返回一个经过下划线包装过的实例
+  // 这个实例调用下划线的方法会返回该实例本身
+  // 直到调用value方法为止
+
   // Add a "chain" function. Start chaining a wrapped Underscore object.
   _.chain = function(obj) {
-    var instance = _(obj);
-    instance._chain = true;
-    return instance;
+    var instance = _(obj); // 下划线包装一下
+    instance._chain = true; // 设置是否链式调用的标志
+    return instance; // 将实例返回
   };
 
   // OOP
@@ -1811,20 +1815,22 @@
     return instance._chain ? _(obj).chain() : obj;
   };
 
+  // 扩展下划线库的一个方法，类似jQ中的extend
+
   // Add your own custom functions to the Underscore object.
   _.mixin = function(obj) {
-    _.each(_.functions(obj), function(name) {
-      var func = _[name] = obj[name];
-      _.prototype[name] = function() {
+    _.each(_.functions(obj), function(name) { // 拿到obj中的所有是函数类型的值组成数组并进行遍历
+      var func = _[name] = obj[name]; // 获取functon name并设置为下划线的静态属性
+      _.prototype[name] = function() { // 添加到下划线原型身上
         var args = [this._wrapped];
         push.apply(args, arguments);
-        return result(this, func.apply(_, args));
+        return result(this, func.apply(_, args)); // 这一句非常的重要
       };
     });
   };
 
   // Add all of the Underscore functions to the wrapper object.
-  _.mixin(_);
+  _.mixin(_); // 将下划线的静态方法都扩展到了其原型身上
 
   // Add all mutator Array functions to the wrapper.
   _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
