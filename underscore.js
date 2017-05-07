@@ -1617,12 +1617,16 @@
     };
   };
 
+  // 调用给定的迭代函数n次
+  // 每一次调用iteratee都传入一个索引值i，这个i就是0, 1, 2, 3 ... n
+  // 最后将一个存着多次调用迭代函数返回值的数组返回
+
   // Run a function **n** times.
   _.times = function(n, iteratee, context) {
     var accum = Array(Math.max(0, n));
-    iteratee = optimizeCb(iteratee, context, 1);
-    for (var i = 0; i < n; i++) accum[i] = iteratee(i);
-    return accum;
+    iteratee = optimizeCb(iteratee, context, 1); // 绑定一下this作用域
+    for (var i = 0; i < n; i++) accum[i] = iteratee(i); // 将每一次调用iteratee的返回值存入数组accum
+    return accum; // 最后将结果返回
   };
 
   // random随机函数，返回[min, max)之间的一个整数
@@ -1656,22 +1660,28 @@
   };
   var unescapeMap = _.invert(escapeMap);
 
+  // 用来创建_.escape和_.unescape的函数，接收一个对象，返回一个函数
+
   // Functions for escaping and unescaping strings to/from HTML interpolation.
-  var createEscaper = function(map) {
+  var createEscaper = function(map) { // 由这个函数可以联想到dom操作中封装addClass和removeClass使用正则可以怎么做 嘎嘎嘎
     var escaper = function(match) {
       return map[match];
     };
     // Regexes for identifying a key that needs to be escaped
-    var source = '(?:' + _.keys(map).join('|') + ')';
-    var testRegexp = RegExp(source);
+    var source = '(?:' + _.keys(map).join('|') + ')'; // escape => (?:&|<|>|"|'|`) unescape反过来取对应的值
+    var testRegexp = RegExp(source); // 得到接下来匹配的正则表达式
     var replaceRegexp = RegExp(source, 'g');
     return function(string) {
       string = string == null ? '' : '' + string;
-      return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
+      return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string; // 将需要替换的key变成map中的值
     };
   };
   _.escape = createEscaper(escapeMap);
   _.unescape = createEscaper(unescapeMap);
+
+  // 如果指定的对象object的属性property的值是一个函数，那么将在object上下文内调用它;
+  // 否则，返回它。
+  // 如果提供默认值，并且属性不存在，那么默认值将被返回。如果设置defaultValue是一个函数，它的结果将被返回。
 
   // If the value of the named `property` is a function then invoke it with the
   // `object` as context; otherwise, return it.
