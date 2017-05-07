@@ -1046,6 +1046,9 @@
     };
   };
 
+  // 将第一个函数func封装到第二个函数wrapper里面
+  // 可以在wrapper中的前面或者后面去执行func
+
   // Returns the first function passed as an argument to the second,
   // allowing you to adjust arguments, run code before and after, and
   // conditionally execute the original function.
@@ -1060,18 +1063,24 @@
     };
   };
 
+  // 返回函数集 functions 组合后的复合函数
+  // 感觉这里有点类似管道的思想，前一个pipe的输出作为后一个pipe的输入，最后处理完成再将结果返回
+
   // Returns a function that is the composition of a list of functions, each
   // consuming the return value of the function that follows.
   _.compose = function() {
     var args = arguments;
-    var start = args.length - 1;
+    var start = args.length - 1; // 从最后一个参数开始处理
     return function() {
       var i = start;
-      var result = args[start].apply(this, arguments);
-      while (i--) result = args[i].call(this, result);
+      var result = args[start].apply(this, arguments); // 执行最后一个函数
+      while (i--) result = args[i].call(this, result); // 从后往前一个个调用传进来的函数，并将上一次执行的结果作为参数传进下一个函数
       return result;
     };
   };
+
+  // 创建一个函数只有在运行了times次之后，func才会执行
+  // 如果在处理多个异步请求的时候，我们需要确保所有的请求都完成之后才执行func这个函数,_.after将非常有用
 
   // Returns a function that will only be executed on and after the Nth call.
   _.after = function(times, func) {
@@ -1081,6 +1090,9 @@
       }
     };
   };
+
+  // 创建一个函数，这个函数调用次数不超过times次
+  // 如果次数 >= times 则最后一次调用函数的返回值将被记住并一直返回该值
 
   // Returns a function that will only be executed up to (but not including) the Nth call.
   _.before = function(times, func) {
@@ -1093,6 +1105,11 @@
       return memo;
     };
   };
+
+  // 创建一个只能调用一次的函数
+  // 重复调用改进的方法也没有效果，只会返回第一次执行时的结果。
+  // 作为初始化函数使用时非常有用, 不用再设一个boolean值来检查是否已经初始化完成.
+  // 突然想起自己现在维护的公司的一个项目初始化操作就可以用这个方法,太赞
 
   // Returns a function that will be executed at most one time, no matter how
   // often you call it. Useful for lazy initialization.
