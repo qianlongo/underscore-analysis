@@ -31,5 +31,7 @@
 
 [(void 0)与undefined之间的小九九](https://github.com/qianlongo/underscore-analysis/issues/4) (2017-5-9)
 
+[那些不起眼的小工具？](https://github.com/qianlongo/underscore-analysis/issues/5) (2017-5-10)
+
 
 
