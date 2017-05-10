@@ -33,5 +33,4 @@
 
 [那些不起眼的小工具？](https://github.com/qianlongo/underscore-analysis/issues/5) (2017-5-10)
 
-
-
+[教你认清这8大杀手锏](https://github.com/qianlongo/underscore-analysis/issues/6) (2017-5-11)
