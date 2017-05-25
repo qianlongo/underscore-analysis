@@ -38,3 +38,5 @@
 [悄悄地说一个bug](https://github.com/qianlongo/underscore-analysis/issues/7) (2017-5-12)
 
 [如何写一个实用的bind？](https://github.com/qianlongo/underscore-analysis/issues/8) [2017-5-21]
+
+[你要看看这些有趣的函数方法吗？](https://github.com/qianlongo/underscore-analysis/issues/9) [2017-5-26]

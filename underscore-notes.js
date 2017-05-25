@@ -967,7 +967,7 @@
 
   // 延迟调用function
   // 这里使用了_.partial， _.delay，并且有一个_作为函数占位，等待_.defer实际传入
-  // 类似使用延时为0的setTimeout方法。对于执行开销大的计算和无阻塞UI线程的HTML渲染时候非常有用
+  // 类似使用延时为1的setTimeout方法。对于执行开销大的计算和无阻塞UI线程的HTML渲染时候非常有用
 
   // Defers a function, scheduling it to run after the current call stack has
   // cleared.
