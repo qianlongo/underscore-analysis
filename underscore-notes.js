@@ -179,6 +179,7 @@
 
   // 判断对象是否为类数组
   // 判断的依据是对象含有的length属性值是否是有意义的正数
+  // 其实函数和window对象都有length属性，所以这里判断是不够严谨的
 
   var isArrayLike = function(collection) {
     var length = getLength(collection);
