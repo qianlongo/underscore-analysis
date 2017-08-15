@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>节流-throttle</title>
+  <script src="../underscore-1.8.3.js"></script>
+  <style>
+    [class^="box"]{
+      width: 100px;
+      height: 100px;
+      border: solid 1px red;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="box1"></div>
+  <div class="box2"></div>
+  <script>
+    let doc = document
+    let boxs =document.querySelectorAll('[class^="box"]')
+    let box1 =boxs[0]
+    let box2 =boxs[1]
+    let num1 = 0
+    let num2 = 0
+    let timer = null
+
+    box1.addEventListener('mousemove', function () {
+      this.innerHTML = num1++
+    })
+
+    box2.addEventListener('mousemove', function () {
+      let _this = this
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        _this.innerHTML = num2++
+      }, 1000)
+    }, false)
+
+    box2.addEventListener('mousemove', _.throttle(function () {
+      this.innerHTML = num2++
+    }, 1000), false)
+  </script>
+</body>
+
+</html>

@@ -979,9 +979,14 @@
   // as much as it can, without ever going more than once per `wait` duration;
   // but if you'd like to disable the execution on the leading edge, pass
   // `{leading: false}`. To disable execution on the trailing edge, ditto.
+
+  // 函数节流，非常重要。
+
   _.throttle = function(func, wait, options) {
     var context, args, result;
+    // 存储定时器
     var timeout = null;
+    // 记录上一次返回的节流函数执行时间
     var previous = 0;
     if (!options) options = {};
     var later = function() {
@@ -992,15 +997,20 @@
     };
     return function() {
       var now = _.now();
+      // 默认是会尽快执行传入的函数，但是如果传入leading为false则反之
       if (!previous && options.leading === false) previous = now;
+      // 计算当前执行时间距离上次执行是否已经到了wait时间
       var remaining = wait - (now - previous);
       context = this;
       args = arguments;
+      // remaining <= 0表示已经超过或者正好等于wait时间
       if (remaining <= 0 || remaining > wait) {
+        // 定时器如果存在会先将其清除
         if (timeout) {
           clearTimeout(timeout);
           timeout = null;
         }
+        // 将previous保存为当前时间，并执行callback
         previous = now;
         result = func.apply(context, args);
         if (!timeout) context = args = null;
