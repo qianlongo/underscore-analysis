@@ -29,14 +29,14 @@
 
 ## 文章列表
 
-[(void 0)与undefined之间的小九九](https://github.com/qianlongo/underscore-analysis/issues/4) (2017-5-9)
+* [(void 0)与undefined之间的小九九](https://github.com/qianlongo/underscore-analysis/issues/4) (2017-5-9)
 
-[那些不起眼的小工具？](https://github.com/qianlongo/underscore-analysis/issues/5) (2017-5-10)
+* [那些不起眼的小工具？](https://github.com/qianlongo/underscore-analysis/issues/5) (2017-5-10)
 
-[教你认清这8大杀手锏](https://github.com/qianlongo/underscore-analysis/issues/6) (2017-5-11)
+* [教你认清这8大杀手锏](https://github.com/qianlongo/underscore-analysis/issues/6) (2017-5-11)
 
-[悄悄地说一个bug](https://github.com/qianlongo/underscore-analysis/issues/7) (2017-5-12)
+* [悄悄地说一个bug](https://github.com/qianlongo/underscore-analysis/issues/7) (2017-5-12)
 
-[如何写一个实用的bind？](https://github.com/qianlongo/underscore-analysis/issues/8) [2017-5-21]
+* [如何写一个实用的bind？](https://github.com/qianlongo/underscore-analysis/issues/8) [2017-5-21]
 
-[你要看看这些有趣的函数方法吗？](https://github.com/qianlongo/underscore-analysis/issues/9) [2017-5-26]
+* [你要看看这些有趣的函数方法吗？](https://github.com/qianlongo/underscore-analysis/issues/9) [2017-5-26]
