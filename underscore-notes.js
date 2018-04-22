@@ -1596,6 +1596,8 @@
     return value;
   };
 
+  // 返回一个函数，该函数返回调用_.constant(value)时传的参数value
+
   // Predicate-generating functions. Often useful outside of Underscore.
   _.constant = function(value) {
     return function() {
